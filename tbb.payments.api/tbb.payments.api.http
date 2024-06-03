@@ -1,0 +1,6 @@
+@tbb.payments.api_HostAddress = http://localhost:5109
+
+GET {{tbb.payments.api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
