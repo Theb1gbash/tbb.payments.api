@@ -1,13 +1,11 @@
-﻿using tbb.payments.api.Models;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using tbb.payments.api.Models;
 
 namespace tbb.payments.api.Interfaces
 {
     public interface IPaymentRepository
     {
-        Task SavePaymentAsync(Payment payment);
-        Task<Payment> GetPaymentAsync(Guid paymentId);
-        Task SaveRefundAsync(Refund refund);
+        Task<bool> AddRefundRecordAsync(RefundDetails refundDetails);
+        Task<string> GetUserEmailByIdAsync(string userId);
     }
 }

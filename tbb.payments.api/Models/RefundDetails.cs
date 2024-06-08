@@ -2,8 +2,9 @@
 {
     public class RefundDetails
     {
-        public Guid PaymentId { get; set; }
+        public string TransactionId { get; set; }
         public decimal Amount { get; set; }
-        public string Reason { get; set; }
+        public string UserId { get; set; }  // Ensure this property exists
+        // Other properties...
     }
 }

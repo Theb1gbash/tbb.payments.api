@@ -1,8 +1,8 @@
-﻿using System.Data.SqlClient;
-using Dapper;
+﻿using System.Threading.Tasks;
 using tbb.payments.api.Interfaces;
 using tbb.payments.api.Models;
-using System.Threading.Tasks;
+using Dapper;
+using System.Data.SqlClient;
 
 namespace tbb.payments.api.Repositories
 {
@@ -15,30 +15,22 @@ namespace tbb.payments.api.Repositories
             _connectionString = connectionString;
         }
 
-        public async Task SavePaymentAsync(Payment payment)
+        public async Task<bool> AddRefundRecordAsync(RefundDetails refundDetails)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = "INSERT INTO Payments (Id, Amount, Status, Email, TicketDetails) VALUES (@Id, @Amount, @Status, @Email, @TicketDetails)";
-                await connection.ExecuteAsync(query, payment);
+                var sql = "INSERT INTO Refunds (TransactionId, Amount, UserId) VALUES (@TransactionId, @Amount, @UserId)";
+                var result = await connection.ExecuteAsync(sql, refundDetails);
+                return result > 0;
             }
         }
 
-        public async Task<Payment> GetPaymentAsync(Guid paymentId)
+        public async Task<string> GetUserEmailByIdAsync(string userId)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = "SELECT * FROM Payments WHERE Id = @Id";
-                return await connection.QueryFirstOrDefaultAsync<Payment>(query, new { Id = paymentId });
-            }
-        }
-
-        public async Task SaveRefundAsync(Refund refund)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var query = "INSERT INTO Refunds (Id, PaymentId, Amount, Reason) VALUES (@Id, @PaymentId, @Amount, @Reason)";
-                await connection.ExecuteAsync(query, refund);
+                var sql = "SELECT Email FROM Users WHERE UserId = @UserId";
+                return await connection.QuerySingleOrDefaultAsync<string>(sql, new { UserId = userId });
             }
         }
     }
