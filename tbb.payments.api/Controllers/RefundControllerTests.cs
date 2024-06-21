@@ -1,46 +1,39 @@
-﻿using Xunit;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using tbb.payments.api.Interfaces;
 using tbb.payments.api.Controllers;
+using tbb.payments.api.Interfaces;
 using tbb.payments.api.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace tbb.payments.api.Tests
 {
+    [TestClass]
     public class RefundControllerTests
     {
-        private readonly Mock<IRefundProvider> _mockRefundProvider;
-        private readonly Mock<IPaymentRepository> _mockPaymentRepository;
-        private readonly Mock<IEmailService> _mockEmailService;
-        private readonly RefundController _controller;
+        private Mock<IRefundProvider> _refundProviderMock;
+        private RefundController _refundController;
 
-        public RefundControllerTests()
+        [TestInitialize]
+        public void Initialize()
         {
-            _mockRefundProvider = new Mock<IRefundProvider>();
-            _mockPaymentRepository = new Mock<IPaymentRepository>();
-            _mockEmailService = new Mock<IEmailService>();
-            _controller = new RefundController(_mockRefundProvider.Object, _mockPaymentRepository.Object, _mockEmailService.Object);
+            _refundProviderMock = new Mock<IRefundProvider>();
+            _refundController = new RefundController(_refundProviderMock.Object);
         }
 
-        [Fact]
-        public async Task ProcessRefund_ReturnsOkResult_WhenRefundIsSuccessful()
+        [TestMethod]
+        public async Task ProcessRefund_ReturnsSuccess_WhenRefundIsProcessed()
         {
             // Arrange
-            var refundDetails = new RefundDetails { TransactionId = "test_id", Amount = 100, UserId = "user1" };
-            _mockRefundProvider.Setup(r => r.ProcessRefundAsync(refundDetails)).ReturnsAsync(true);
-            _mockPaymentRepository.Setup(r => r.AddRefundRecordAsync(refundDetails)).ReturnsAsync(true);
-            _mockPaymentRepository.Setup(r => r.GetUserEmailByIdAsync(refundDetails.UserId)).ReturnsAsync("test@example.com");
-            _mockEmailService.Setup(e => e.SendEmailAsync("test@example.com", "Refund Processed", It.IsAny<string>())).Returns(Task.CompletedTask);
+            var refundDetails = new RefundDetails ();
+            _refundProviderMock.Setup(x => x.ProcessRefundAsync(refundDetails)).ReturnsAsync(true);
 
             // Act
-            var result = await _controller.ProcessRefund(refundDetails);
+            var result = await _refundController.ProcessRefund(refundDetails);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(200, okResult.StatusCode);
+            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
         }
-
-        // Additional tests for other scenarios
     }
 }

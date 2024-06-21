@@ -24,6 +24,8 @@ namespace tbb.payments.api.Providers
 
                 var body = new RefundPaymentRequest.Builder(
                     idempotencyKey: Guid.NewGuid().ToString(),
+                    
+
                     amountMoney: new Money.Builder()
                         .Amount((long)(refundDetails.Amount * 100)) // Square API requires amount in cents
                         .Currency("USD")

@@ -1,10 +1,11 @@
-﻿namespace tbb.payments.api.Models
+﻿using System;
+
+namespace tbb.payments.api.Models
 {
     public class RefundDetails
     {
-        public string TransactionId { get; set; }
+        public Guid TransactionId { get; set; }
         public decimal Amount { get; set; }
-        public string UserId { get; set; }  // Ensure this property exists
-        // Other properties...
+        public string Reason { get; set; }
     }
 }

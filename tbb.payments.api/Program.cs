@@ -1,3 +1,4 @@
+using Serilog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,8 +13,17 @@ using FluentEmail.Razor;
 using Square;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
+using Square.Authentication;
+using tbb.payments.api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -57,9 +67,10 @@ builder.Services.AddSingleton<ISquareClient>(sp =>
 {
     var settings = sp.GetRequiredService<IOptions<SquareSettings>>().Value;
     var environment = settings.Environment.ToLower() == "production" ? Square.Environment.Production : Square.Environment.Sandbox;
+    var bearerAuthCredentials = new BearerAuthModel. Builder(settings.AccessToken). Build();
     return new SquareClient.Builder()
         .Environment(environment)
-        .AccessToken(settings.AccessToken)
+        .BearerAuthCredentials(bearerAuthCredentials)
         .Build();
 });
 
@@ -75,9 +86,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage(); // Enable detailed error messages
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ErrorHandlingMiddleware>(); // Use the error handling middleware
 
 app.UseHttpsRedirection();
 

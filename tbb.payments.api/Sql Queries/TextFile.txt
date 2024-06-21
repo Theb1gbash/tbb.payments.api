@@ -1,0 +1,110 @@
+﻿CREATE DATABASE [tbb.payments];
+GO
+
+USE [tbb.payments];
+GO
+
+
+
+
+CREATE TABLE Payments (
+    Id UNIQUEIDENTIFIER PRIMARY KEY,
+    Amount DECIMAL(18, 2) NOT NULL,
+    Status NVARCHAR(50) NOT NULL,
+    Email NVARCHAR(255) NOT NULL,
+    TicketDetails NVARCHAR(MAX) NOT NULL
+);
+GO
+
+
+
+
+
+CREATE TABLE Refunds (
+    Id UNIQUEIDENTIFIER PRIMARY KEY,
+    PaymentId UNIQUEIDENTIFIER NOT NULL,
+    Amount DECIMAL(18, 2) NOT NULL,
+    Reason NVARCHAR(MAX),
+    FOREIGN KEY (PaymentId) REFERENCES Payments(Id)
+);
+GO
+
+
+
+
+
+
+
+USE [tbb.payments];
+GO
+
+-- Insert test data into Payments table
+INSERT INTO Payments (Id, Amount, Status, Email, TicketDetails)
+VALUES
+(NEWID(), 100.00, 'Completed', 'user1@example.com', 'Event: Concert, Venue: Stadium, Date: 2024-07-01, Seat: A1'),
+(NEWID(), 150.50, 'Pending', 'user2@example.com', 'Event: Theater, Venue: City Theater, Date: 2024-07-02, Seat: B2'),
+(NEWID(), 200.00, 'Failed', 'user3@example.com', 'Event: Sports, Venue: Arena, Date: 2024-07-03, Seat: C3');
+GO
+
+-- Insert test data into Refunds table
+-- Make sure to use valid PaymentId from the Payments table
+DECLARE @PaymentId UNIQUEIDENTIFIER;
+SET @PaymentId = (SELECT TOP 1 Id FROM Payments WHERE Status = 'Completed');
+
+INSERT INTO Refunds (Id, PaymentId, Amount, Reason)
+VALUES
+(NEWID(), @PaymentId, 100.00, 'Customer Request');
+GO
+
+
+
+
+
+
+
+
+-- Check Payments table
+SELECT * FROM Payments;
+GO
+
+-- Check Refunds table
+SELECT * FROM Refunds;
+GO
+
+
+
+{[Certainly! Here are two sample requests for the PaymentDetails object in JSON format:
+
+Request 1: Concert Ticket Purchase}]
+
+
+{
+  "cardNumber": "4111111111111111",
+  "expiryDate": "12/25",
+  "cvc": "123",
+  "amount": 100.00,
+  "currency": "USD",
+  "email": "user1@example.com",
+  "ticketDetails": "Event: Concert, Venue: Stadium, Date: 2024-07-01, Seat: A1"
+}
+
+
+
+
+{
+  "cardNumber": "4222222222222222",
+  "expiryDate": "11/24",
+  "cvc": "456",
+  "amount": 150.50,
+  "currency": "USD",
+  "email": "user2@example.com",
+  "ticketDetails": "Event: Theater, Venue: City Theater, Date: 2024-07-02, Seat: B2"
+}
+
+
+
+
+
+
+
+

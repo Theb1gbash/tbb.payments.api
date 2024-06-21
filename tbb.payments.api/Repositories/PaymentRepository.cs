@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
-using tbb.payments.api.Interfaces;
-using tbb.payments.api.Models;
+﻿using System;
+using System.Threading.Tasks;
 using Dapper;
 using System.Data.SqlClient;
+using tbb.payments.api.Interfaces;
+using tbb.payments.api.Models;
 
 namespace tbb.payments.api.Repositories
 {
@@ -12,25 +13,42 @@ namespace tbb.payments.api.Repositories
 
         public PaymentRepository(string connectionString)
         {
-            _connectionString = connectionString;
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
-        public async Task<bool> AddRefundRecordAsync(RefundDetails refundDetails)
+        public async Task SavePaymentAsync(Payment payment)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var sql = "INSERT INTO Refunds (TransactionId, Amount, UserId) VALUES (@TransactionId, @Amount, @UserId)";
-                var result = await connection.ExecuteAsync(sql, refundDetails);
-                return result > 0;
+                var query = "INSERT INTO Payments (Id, Amount, Status, Email, TicketDetails) VALUES (@Id, @Amount, @Status, @Email, @TicketDetails)";
+                await connection.ExecuteAsync(query, payment);
             }
         }
 
-        public async Task<string> GetUserEmailByIdAsync(string userId)
+        public async Task<Payment> GetPaymentAsync(Guid paymentId)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var sql = "SELECT Email FROM Users WHERE UserId = @UserId";
-                return await connection.QuerySingleOrDefaultAsync<string>(sql, new { UserId = userId });
+                var query = "SELECT * FROM Payments WHERE Id = @Id";
+                return await connection.QueryFirstOrDefaultAsync<Payment>(query, new { Id = paymentId });
+            }
+        }
+
+        public async Task SaveRefundAsync(Refund refund)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "INSERT INTO Refunds (Id, PaymentId, Amount, Reason) VALUES (@Id, @PaymentId, @Amount, @Reason)";
+                await connection.ExecuteAsync(query, refund);
+            }
+        }
+
+        public async Task AddRefundRecordAsync(RefundDetails refundDetails)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "INSERT INTO Refunds (PaymentId, Amount, Reason) VALUES (@PaymentId, @Amount, @Reason)";
+                await connection.ExecuteAsync(query, refundDetails);
             }
         }
     }
