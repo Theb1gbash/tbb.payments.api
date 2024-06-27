@@ -27,15 +27,5 @@ namespace tbb.payments.api.Controllers
             return BadRequest(new { Message = "Payment processing failed." });
         }
 
-        [HttpPost("refund")]
-        public async Task<IActionResult> ProcessRefund([FromBody] RefundDetails refundDetails)
-        {
-            var result = await _paymentProvider.ProcessRefundAsync(refundDetails);
-            if (result)
-            {
-                return Ok(new { Message = "Refund processed successfully." });
-            }
-            return BadRequest(new { Message = "Refund processing failed." });
-        }
     }
 }

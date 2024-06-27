@@ -2,7 +2,7 @@
 
 namespace tbb.payments.api.Models
 {
-    public class Payment
+    public class Payments
     {
         public Guid Id { get; set; }
         public decimal Amount { get; set; }

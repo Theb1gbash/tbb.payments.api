@@ -4,6 +4,7 @@ using Square.Exceptions;
 using tbb.payments.api.Interfaces;
 using tbb.payments.api.Models;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace tbb.payments.api.Providers
 {
@@ -29,8 +30,13 @@ namespace tbb.payments.api.Providers
                     amountMoney: new Money.Builder()
                         .Amount((long)(refundDetails.Amount * 100)) // Square API requires amount in cents
                         .Currency("USD")
-                        .Build()).Build();
+                        .Build()).PaymentId(refundDetails.PaymentId).Build();
+
+                Console.WriteLine($"Request Body: {JsonConvert.SerializeObject(body)}");
+
                 var result = await refundsApi.RefundPaymentAsync(body);
+
+                
 
                 // Assuming refund is successful if no exception is thrown
                 return result != null && result.Refund != null && result.Refund.Status == "APPROVED";

@@ -7,5 +7,6 @@ namespace tbb.payments.api.Models
         public Guid TransactionId { get; set; }
         public decimal Amount { get; set; }
         public string Reason { get; set; }
+        public string PaymentId { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace tbb.payments.api.Repositories
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
-        public async Task SavePaymentAsync(Payment payment)
+        public async Task SavePaymentAsync(Payments payment)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -25,12 +25,12 @@ namespace tbb.payments.api.Repositories
             }
         }
 
-        public async Task<Payment> GetPaymentAsync(Guid paymentId)
+        public async Task<Payments> GetPaymentAsync(Guid paymentId)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 var query = "SELECT * FROM Payments WHERE Id = @Id";
-                return await connection.QueryFirstOrDefaultAsync<Payment>(query, new { Id = paymentId });
+                return await connection.QueryFirstOrDefaultAsync<Payments>(query, new { Id = paymentId });
             }
         }
 
